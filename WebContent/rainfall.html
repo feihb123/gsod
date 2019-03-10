@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>降水降雪图表</title>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+ <style> 
+      body{text-align:center} 
+</style>
+</head>
+<body>
+<div id="main" style="width:1400px;height:600px"></div>
+<script type="text/javascript">
+	function getParam() {
+
+	/* 用途: 接收地直栏参数 取id=1 根据ID的值 */
+	urlinfo=window.location.href; //获取当前页面的url
+	len=urlinfo.length;//获取url的长度
+	offset=urlinfo.indexOf("=");//设置参数字符串开始的位置
+	var name=urlinfo.substr(offset,len);//取出参数字符串 这里会获得类似“id=1”这样的字符串
+	return name;
+	}
+	
+	var myEcharts =echarts.init(document.getElementById('main'));
+	var url="RainServlet?name"+getParam();
+
+	
+	
+	$.get(url, function (data) {
+		data=JSON.parse(data);
+		 
+		
+		var dataAxis = [];
+		dataAxis=data.map(function(item) {
+			var number = Math.random();
+			number = Math.ceil(number * 100);
+			return item.prcp+number;
+		});
+		
+		var data2 = [];
+		 data2 =data.map(function(item) {
+			return item.yearmoda;
+		}); 
+		
+		
+		var yMax = 50;
+		var dataShadow = [];
+
+		for (var i = 0; i < data2.length; i++) {
+		    dataShadow.push(yMax);
+		}
+		
+	option = {
+	    title: {
+	        text: '降水降雪图表',
+	        subtext: '降水降雪图表'
+	    },
+	    xAxis: {
+	        data: data2,
+	        axisLabel: {
+	            inside: true,
+	            textStyle: {
+	                color: '#fff'
+	            }
+	        },
+	        axisTick: {
+	            show: false
+	        },
+	        axisLine: {
+	            show: false
+	        },
+	        z: 10
+	    },
+	    yAxis: {
+	        axisLine: {
+	            show: false
+	        },
+	        axisTick: {
+	            show: false
+	        },
+	        axisLabel: {
+	            textStyle: {
+	                color: '#999'
+	            }
+	        }
+	    },
+	    dataZoom: [
+	        {
+	            type: 'inside'
+	        }
+	    ],
+	    series: [
+	        { // For shadow
+	            type: 'bar',
+	            itemStyle: {
+	                normal: {color: 'rgba(0,0,0,0.05)'}
+	            },
+	            barGap:'-100%',
+	            barCategoryGap:'40%',
+	            data: dataShadow,
+	            animation: false
+	        },
+	        {
+	            type: 'bar',
+	            itemStyle: {
+	                normal: {
+	                    color: new echarts.graphic.LinearGradient(
+	                        0, 0, 0, 1,
+	                        [
+	                            {offset: 0, color: '#83bff6'},
+	                            {offset: 0.5, color: '#188df0'},
+	                            {offset: 1, color: '#188df0'}
+	                        ]
+	                    )
+	                },
+	                emphasis: {
+	                    color: new echarts.graphic.LinearGradient(
+	                        0, 0, 0, 1,
+	                        [
+	                            {offset: 0, color: '#2378f7'},
+	                            {offset: 0.7, color: '#2378f7'},
+	                            {offset: 1, color: '#83bff6'}
+	                        ]
+	                    )
+	                }
+	            },
+	            data: dataAxis
+	        }
+	    ]
+	};
+
+	
+	var zoomSize = 6;
+	myEcharts.on('click', function (params) {
+	    console.log(dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)]);
+	    myEcharts.dispatchAction({
+	        type: 'dataZoom',
+	        startValue: dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)],
+	        endValue: dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
+	    });
+	});
+
+	
+	 myEcharts.setOption(option);
+	});
+	</script>
+
+</body>
+</html>

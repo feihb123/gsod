@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>风速状况</title>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+ <style> 
+      body{text-align:center} 
+</style>
+</head>
+<body>
+<div id="main" style="width:1400px;height:600px"></div>
+<script type="text/javascript">
+	function getParam() {
+
+	/* 用途: 接收地直栏参数 取id=1 根据ID的值 */
+	urlinfo=window.location.href; //获取当前页面的url
+	len=urlinfo.length;//获取url的长度
+	offset=urlinfo.indexOf("=");//设置参数字符串开始的位置
+	var name=urlinfo.substr(offset,len);//取出参数字符串 这里会获得类似“id=1”这样的字符串
+	return name;
+	}
+	
+	var myEcharts =echarts.init(document.getElementById('main'));
+	var url="WindServlet?name"+getParam(); 
+	
+$.get(url, function (data) {
+	data=JSON.parse(data);
+	
+	option = {
+    title : {
+        text: '风速状况',
+        subtext: '数据来源gsod'
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['平均风速','持续最大','瞬时最大']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            data : data.map(function(item) {
+    			return item.yearmoda;
+    		})
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'平均风速',
+            type:'bar',
+            data:data.map(function(item) {
+    			return item.wdsp;
+    		}),
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+         {
+            name:'持续最大',
+            type:'bar',
+            data:data.map(function(item) {
+    			return item.mxspd;
+    		}),
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'瞬时最大',
+            type:'bar',
+            data:data.map(function(item) {
+    			return item.gust;
+    		}),
+            markPoint : {
+                data : [
+                    {name : '年最高', value : 182.2, xAxis: 7, yAxis: 183},
+                    {name : '年最低', value : 2.3, xAxis: 11, yAxis: 3}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+	myEcharts.setOption(option);
+});
+</script>
+</body>
+</html>

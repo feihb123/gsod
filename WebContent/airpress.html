@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>气压类图标</title>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+ <style> 
+      body{text-align:center} 
+</style>
+</head>
+<body>
+<div id="main" style="width:1400px;height:600px"></div>
+<script type="text/javascript">
+	function getParam() {
+
+	/* 用途: 接收地直栏参数 取id=1 根据ID的值 */
+	urlinfo=window.location.href; //获取当前页面的url
+	len=urlinfo.length;//获取url的长度
+	offset=urlinfo.indexOf("=");//设置参数字符串开始的位置
+	var name=urlinfo.substr(offset,len);//取出参数字符串 这里会获得类似“id=1”这样的字符串
+	return name;
+	}
+	
+	var myEcharts =echarts.init(document.getElementById('main'));
+	var url="AirServlet?name"+getParam();
+	
+	$.get(url,function(data){	
+	data=JSON.parse(data);
+	
+	var xAxisData = [];
+	var data1 = [];
+	var data2 = [];
+	xAxisData=data.map(function(item) {
+		return item.yearmoda
+	});
+	data1=data.map(function(item) {
+		return item.slp
+	});
+	data2=data.map(function(item) {
+		return item.stp
+	});
+	
+
+	option = {
+	    title: {
+	        text: '柱状图动画延迟'
+	    },
+	    legend: {
+	        data: ['sea', 'ground'],
+	        align: 'left'
+	    },
+	    toolbox: {
+	        // y: 'bottom',
+	        feature: {
+	            magicType: {
+	                type: ['stack', 'tiled']
+	            },
+	            dataView: {},
+	            saveAsImage: {
+	                pixelRatio: 2
+	            }
+	        }
+	    },
+	    tooltip: {},
+	    xAxis: {
+	        data: xAxisData,
+	        silent: false,
+	        splitLine: {
+	            show: false
+	        }
+	    },
+	    yAxis: {
+	    },
+	    series: [{
+	        name: 'sea',
+	        type: 'bar',
+	        data: data1,
+	        animationDelay: function (idx) {
+	            return idx * 10;
+	        }
+	    }, {
+	        name: 'ground',
+	        type: 'bar',
+	        data: data2,
+	        animationDelay: function (idx) {
+	            return idx * 10 + 100;
+	        }
+	    }],
+	    animationEasing: 'elasticOut',
+	    animationDelayUpdate: function (idx) {
+	        return idx * 5;
+	    }
+	};
+	myEcharts.setOption(option);
+	});
+	
+</script>
+</body>
+</html>

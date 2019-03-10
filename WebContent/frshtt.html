@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>极端天气类信息</title>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<div id="main" style="width:1510px;height:705px" align="center"></div>
+	<script type="text/javascript">
+	function getParam() {
+
+		/* 用途: 接收地直栏参数 取id=1 根据ID的值 */
+		urlinfo=window.location.href; //获取当前页面的url
+		len=urlinfo.length;//获取url的长度
+		offset=urlinfo.indexOf("=");//设置参数字符串开始的位置
+		var name=urlinfo.substr(offset,len);//取出参数字符串 这里会获得类似“id=1”这样的字符串
+		return name;
+		}
+	var myEcharts =echarts.init(document.getElementById('main'));
+	var url="FrshttServlet?name"+getParam();
+	
+	$.get(url,function(data){
+	
+	data=JSON.parse(data);
+
+	option = {
+		    backgroundColor: '#2c343c',
+
+		    title: {
+		        text: '恶劣天气饼图',
+		        left: 'center',
+		        top: 20,
+		        textStyle: {
+		            color: '#ccc'
+		        }
+		    },
+
+		    tooltip : {
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b} : {c} ({d}%)"
+		    },
+
+		    visualMap: {
+		        show: false,
+		        min: 0,
+		        max: 100,
+		        inRange: {
+		            colorLightness: [0.6, 1]
+		        }
+		    },
+		    series : [
+		        {
+		            name:'访问来源:gsod',
+		            type:'pie',
+		            radius : '55%',
+		            center: ['50%', '50%'],
+		
+		            data:[
+		            	  {value:data[0], name:'雾'},
+		                  {value:data[1], name:'雨'},
+		                  {value:data[2], name:'雪'},
+		                  {value:data[3], name:'冰雹'},
+		                  {value:data[4], name:'雷霆'},
+		                  {value:data[5], name:'龙卷风'}
+		                  
+		            ].sort(function (a, b) { return a.value - b.value; }),
+		            roseType: 'radius',
+		            label: {
+		                normal: {
+		                    textStyle: {
+		                        color: 'rgba(255, 255, 255, 0.3)'
+		                    }
+		                }
+		            },
+		            labelLine: {
+		                normal: {
+		                    lineStyle: {
+		                        color: 'rgba(255, 255, 255, 0.3)'
+		                    },
+		                    smooth: 0.2,
+		                    length: 10,
+		                    length2: 20
+		                }
+		            },
+		            itemStyle: {
+		                normal: {
+		                    color: '#c23531',
+		                    shadowBlur: 200,
+		                    shadowColor: 'rgba(255, 192, 203, 0.5)'
+		                }
+		            },
+
+		            animationType: 'scale',
+		            animationEasing: 'elasticOut',
+		            animationDelay: function (idx) {
+		                return Math.random() * 200;
+		            }
+		        }
+		    ]
+		};
+	
+	myEcharts.setOption(option);
+	
+	});
+	</script>
+</body>
+</html>
