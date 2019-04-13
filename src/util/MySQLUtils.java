@@ -26,9 +26,9 @@ public class MySQLUtils {
 		//静态的调用：类名调用、对象调用
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			String url="jdbc:mysql://106.14.12.245:3306/gsod";
-			String user="feihb123";
-			String password="h2486543..";
+			String url="jdbc:mysql://localhost:3306/gsod";
+			String user="root";
+			String password="******";
 			conn=DriverManager.getConnection(url, user, password);
 			
 		} catch (Exception e) {
